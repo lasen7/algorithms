@@ -1,3 +1,8 @@
+/**
+ *  삽입정렬: 가장 작은 값을 찾아서 0번째 인덱스 부터 교체 하는 방식
+ *  시간복잡도: O(n2)
+ *  최악, 최선, 평균의 시간복잡도는 같다
+ */
 const selectionSort = (array) => {
   const copiedArray = array.slice();
 
