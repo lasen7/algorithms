@@ -180,6 +180,172 @@ class RBT {
 
     this.root.color = 'BLACK';
   }
+
+  search(data) {
+    let next = this.root;
+
+    while (next !== null) {
+      if (next.data === data) {
+        return next;
+      } else if (next.data < data) {
+        // right
+        next = next.right;
+      } else {
+        // left
+        next = next.left;
+      }
+    }
+
+    return null;
+  }
+
+
+  minimum(node = this.root) {
+    // on the far left
+    let next = node;
+    while (next.left !== null) {
+      next = next.left;
+    }
+
+    return next;
+  }
+
+  successor(node = this.root) {
+    if (node.right !== null) {
+      return this.minimum(node.right);
+    }
+
+    let parent = node.parent;
+    let child = node;
+    while (parent !== null && child === parent.right) {
+      child = parent;
+      parent = parent.parent;
+    }
+
+    return parent;
+  }
+
+  delete(data) {
+    let node = this.search(data);
+    if (node === null) {
+      // not found
+      return null;
+    }
+
+    // deleteNode는 0 또는 1개의 자식을 갖는다.
+    // 그 이유는 if문에서 left 또는 right가 null인 것을 찾거나
+    // successor는 왼쪽 자식을 갖지 않기 때문이다.
+    let deleteNode = null;
+
+    if (node.left === null || node.right === null) {
+      deleteNode = node;
+    } else {
+      deleteNode = this.successor(node);
+    }
+
+    let childNode = null;
+
+    if (deleteNode.left !== null) {
+      childNode = deleteNode.left;
+    } else {
+      childNode = deleteNode.right;
+    }
+
+    if (childNode !== null) {
+      // 삭제하려고 하는 노드의 자식 노드와 삭제하려는 노드의 부모 노드를 연결한다.
+      childNode.parent = deleteNode.parent;
+    }
+
+    if (deleteNode.parent === null) {
+      // 루트 노드라면 childNode가 루트가 된다
+      this.root = childNode;
+    } else {
+      // 삭제하려는 노드가 부모노드의 왼쪽 노드라면 왼쪽 노드로 연결하고
+      // 오른쪽 노드라면 오른쪽 노드에 연결한다.
+      if (deleteNode === deleteNode.parent.left) {
+        deleteNode.parent.left = childNode;
+      } else {
+        deleteNode.parent.right = childNode;
+      }
+    }
+
+    if (deleteNode !== node) {
+      // case 3: successor
+      node.data = deleteNode.data;
+    }
+
+    if (deleteNode.color === 'BLACK') {
+      this.deleteFixup(childNode);
+    }
+
+    return deleteNode;
+  }
+
+  deleteFixup(node) {
+    while (node !== this.root && node.color === 'BLACK') {
+      if (node === node.parent.left) {
+        let w = node.parent.right;
+        if (w.color = 'RED') {
+          // Case 1
+          w.color = 'BLACK';
+          node.parent.color = 'RED';
+          this.leftRotate(node.parent);
+          w = node.parent.right;
+        }
+
+        if (w.left.color === 'BLACK' && w.right.color === 'BLACK') {
+          // Case 2
+          w.color = 'RED';
+          node = node.parent;
+        } else {
+          if (w.right.color === 'BLACK') {
+            // Case 3
+            w.left.color = 'BLACK';
+            w.color = 'RED';
+            this.rightRotate(w);
+            w = node.parent.right;
+          }
+
+          // Case 4
+          w.color = node.parent.color;
+          node.parent.color = 'BLACK';
+          w.right.color = 'BLACK';
+          this.leftRotate(node.parent);
+          node = this.root;
+        }
+      } else {
+        let w = node.parent.left;
+        if (w.color = 'RED') {
+          // Case 5
+          w.color = 'BLACK';
+          node.parent.color = 'RED';
+          this.leftRotate(node.parent);
+          w = node.parent.left;
+        }
+
+        if (w.right.color === 'BLACK' && w.left.color === 'BLACK') {
+          // Case 6
+          w.color = 'RED';
+          node = node.parent;
+        } else {
+          if (w.left.color === 'BLACK') {
+            // Case 7
+            w.right.color = 'BLACK';
+            w.color = 'RED';
+            this.rightRotate(w);
+            w = node.parent.left;
+          }
+
+          // Case 8
+          w.color = node.parent.color;
+          node.parent.color = 'BLACK';
+          w.left.color = 'BLACK';
+          this.leftRotate(node.parent);
+          node = this.root;
+        }
+      }
+    }
+  }
 }
 
 let tree = new RBT();
@@ -190,7 +356,11 @@ tree.add(1);
 tree.add(7);
 tree.add(2);
 tree.add(10);
-tree.add(9);
-tree.add(4);
+// tree.add(9);
+// tree.add(4);
+
+console.log(tree);
+
+tree.delete(5);
 
 console.log(tree);
