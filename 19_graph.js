@@ -76,6 +76,7 @@ class Vertex {
     this.key = key;
     // 다음 edge를 가리키기 위한 변수
     this.edge = null;
+    this.visited = false;
   }
 }
 
@@ -192,20 +193,93 @@ class Graph {
 
     return null;
   }
+
+  bfs() {
+    // 너비우선탐색: 큐를 이용한다, 그냥 배열 씀
+    let queue = [];
+    let vertex = this.first;
+
+    // visited를 초기화 한다.
+    while (vertex) {
+      vertex.visited = false;
+      vertex = vertex.next;
+    }
+
+    vertex = this.first;
+    queue.push(vertex);
+    vertex.visited = true;
+
+    while (queue.length) {
+      vertex = queue.shift();
+      vertex.visited = true;
+      console.log(vertex.key);
+
+      let edge = vertex.edge;
+      while (edge) {
+        if (!edge.destination.visited) {
+          // 방문 하지 않은 vertex를 큐에 넣는다.
+          queue.push(edge.destination);
+          edge.destination.visited = true;
+        }
+        edge = edge.next;
+      }
+    }
+  }
+
+  dfs() {
+    // 깊이우선탐색: 스택을 이용한다
+    let stack = [];
+    let vertex = this.first;
+
+    // visited를 초기화 한다.
+    while (vertex) {
+      vertex.visited = false;
+      vertex = vertex.next;
+    }
+
+    vertex = this.first;
+    stack.push(vertex);
+    vertex.visited = true;
+
+    while (stack.length) {
+      vertex = stack.pop();
+      console.log(vertex.key);
+
+      let edge = vertex.edge;
+      while (edge) {
+        if (!edge.destination.visited) {
+          stack.push(edge.destination);
+          edge.destination.visited = true;
+        }
+
+        edge = edge.next;
+      }
+    }
+  }
 }
 
 let graph = new Graph();
 graph.insertVertex('A');
-graph.insertVertex('B');
-graph.insertVertex('C');
-graph.insertVertex('D');
+graph.insertVertex('X');
+graph.insertVertex('G');
+graph.insertVertex('H');
+graph.insertVertex('P');
+graph.insertVertex('E');
+graph.insertVertex('Y');
+graph.insertVertex('M');
+graph.insertVertex('J');
 
-//graph.insertEdge(1, 'A', 'B');
-graph.insertTwoWayEdge(1, 'A', 'B');
-graph.insertTwoWayEdge(1, 'A', 'C');
-graph.insertTwoWayEdge(1, 'B', 'C');
+graph.insertTwoWayEdge(1, 'A', 'X');
+graph.insertTwoWayEdge(1, 'X', 'G');
+graph.insertTwoWayEdge(1, 'X', 'H');
+graph.insertTwoWayEdge(1, 'G', 'H');
+graph.insertTwoWayEdge(1, 'G', 'P');
+graph.insertTwoWayEdge(1, 'H', 'E');
+graph.insertTwoWayEdge(1, 'H', 'P');
+graph.insertTwoWayEdge(1, 'E', 'M');
+graph.insertTwoWayEdge(1, 'E', 'Y');
+graph.insertTwoWayEdge(1, 'Y', 'M');
+graph.insertTwoWayEdge(1, 'M', 'J');
 
-// graph.deleteVertex('A');
-graph.deleteEdge('A', 'C');
-
-console.log(graph);
+// graph.bfs();
+graph.dfs();
