@@ -58,3 +58,154 @@
  *  - DFS를 반복하여 모든 노드 방문
  *  - 시간복잡도: O(n+m)
  */
+
+class Edge {
+  constructor(data, dest) {
+    this.next = null;
+    // data는 가중치로 쓰인다
+    this.data = data;
+    // destination는 vertex를 가리키기 위한 변수
+    this.destination = dest;
+  }
+}
+
+class Vertex {
+  constructor(key) {
+    // 다음 Vertex를 가리키기 위한 변수
+    this.next = null;
+    this.key = key;
+    // 다음 edge를 가리키기 위한 변수
+    this.edge = null;
+  }
+}
+
+class Graph {
+  constructor() {
+    this.count = 0;
+    this.first = null;
+  }
+
+  insertVertex(key) {
+    let vertex = new Vertex(key);
+    let last = this.first;
+
+    if (!last) {
+      this.first = vertex;
+    } else {
+      while (last.next !== null) {
+        last = last.next;
+      }
+      last.next = vertex;
+    }
+
+    this.count += 1;
+  }
+
+  insertEdge(data, fromKey, toKey) {
+    let from = this.searchVertex(fromKey);
+    let to = this.searchVertex(toKey);
+
+    if (!from || !to) {
+      return false;
+    }
+
+    let edge = new Edge(data, to);
+    let fromLast = from.edge;
+
+    if (!fromLast) {
+      from.edge = edge;
+    } else {
+      while (fromLast.next !== null) {
+        fromLast = fromLast.next;
+      }
+      fromLast.next = edge;
+    }
+  }
+
+  insertTwoWayEdge(data, fromKey, toKey) {
+    this.insertEdge(data, fromKey, toKey);
+    this.insertEdge(data, toKey, fromKey);
+  }
+
+  deleteVertex(key) {
+    let vertex = this.first;
+    let prev = null;
+
+    while (vertex !== null) {
+      if (vertex.key === key) {
+        break;
+      }
+
+      prev = vertex;
+      vertex = vertex.next;
+    }
+
+    if (!vertex) {
+      return false;
+    }
+
+    if (!prev) {
+      this.first = vertex.next;
+    } else {
+      prev.next = vertex.next;
+    }
+
+    this.count -= 1;
+
+    return true;
+  }
+
+  deleteEdge(fromKey, toKey) {
+    let from = this.searchVertex(fromKey);
+    let fromEdge = from.edge;
+    let prevEdge = null;
+
+    while (fromEdge !== null) {
+      if (fromEdge.destination.key === toKey) {
+        break;
+      }
+
+      prevEdge = fromEdge;
+      fromEdge = fromEdge.next;
+    }
+
+    if (!fromEdge) {
+      return false;
+    }
+
+    if (!prevEdge) {
+      from.edge = fromEdge.next;
+    } else {
+      prevEdge.next = fromEdge.next;
+    }
+  }
+
+  searchVertex(key) {
+    let vertex = this.first;
+
+    while (vertex !== null) {
+      if (vertex.key === key) {
+        return vertex;
+      }
+      vertex = vertex.next;
+    }
+
+    return null;
+  }
+}
+
+let graph = new Graph();
+graph.insertVertex('A');
+graph.insertVertex('B');
+graph.insertVertex('C');
+graph.insertVertex('D');
+
+//graph.insertEdge(1, 'A', 'B');
+graph.insertTwoWayEdge(1, 'A', 'B');
+graph.insertTwoWayEdge(1, 'A', 'C');
+graph.insertTwoWayEdge(1, 'B', 'C');
+
+// graph.deleteVertex('A');
+graph.deleteEdge('A', 'C');
+
+console.log(graph);
